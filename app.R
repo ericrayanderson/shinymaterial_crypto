@@ -72,6 +72,26 @@ ui <- material_page(
                         initial_value = TRUE,
                         color = my_col$LTC)
       )
+    ),
+    tags$br(),
+    tags$br(),
+    tags$br(),
+    tags$br(),
+    tags$br(),
+    tags$br(),
+    material_row(
+      material_column(
+        width = 10,
+        offset = 1,
+        tags$a(href="https://ericrayanderson.github.io/shinymaterial/", "shinymaterial package")
+      )
+    ),
+    material_row(
+      material_column(
+        width = 10,
+        offset = 1,
+        tags$a(href="https://github.com/ericrayanderson/shinymaterial_crypto/", "app code")
+      )
     )
   ),
   tags$br(),
