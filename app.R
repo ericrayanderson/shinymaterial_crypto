@@ -78,19 +78,18 @@ ui <- material_page(
     tags$br(),
     tags$br(),
     tags$br(),
-    tags$br(),
     material_row(
       material_column(
         width = 10,
         offset = 1,
-        tags$a(href="https://ericrayanderson.github.io/shinymaterial/", "shinymaterial package")
+        HTML("<a href='https://github.com/ericrayanderson/shinymaterial_crypto/' target='_blank'> app code <i class='material-icons'>open_in_new</i></a>")
       )
     ),
     material_row(
       material_column(
         width = 10,
         offset = 1,
-        tags$a(href="https://github.com/ericrayanderson/shinymaterial_crypto/", "app code")
+        HTML("<a href='https://ericrayanderson.github.io/shinymaterial/' target='_blank'> shinymaterial package <i class='material-icons'>open_in_new</i></a>")
       )
     )
   ),
