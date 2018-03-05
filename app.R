@@ -75,6 +75,7 @@ ui <- material_page(
     ),
     tags$br(),
     tags$br(),
+    tags$br(),
     material_row(
       material_column(
         width = 10,
