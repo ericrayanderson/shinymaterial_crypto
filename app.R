@@ -34,8 +34,7 @@ ui <- material_page(
         material_radio_button(
           "day_back",
           label = "",
-          choices = c("1 Week" = 7, "1 Month" = 30, "1 Year" = 365),
-          selected = 30
+          choices = c("1 Week" = 7, "1 Month" = 30, "1 Year" = 365)
         )
       )
     ),
