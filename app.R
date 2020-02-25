@@ -13,6 +13,24 @@ my_col <- data_frame(
   "LTC" = "#ff9800"
 )
 
+pull_price <- function(ticker, days){
+  jsonlite::fromJSON(
+    paste0("https://min-api.cryptocompare.com/data/histoday?aggregate=1&e=CCCAGG&extraParams=CryptoCompare&fsym=", ticker, "&limit=", days, "&tryConversion=false&tsym=USD")
+  )$Data %>% 
+    mutate(TICKER = ticker) %>% 
+    mutate(date = lubridate::as_datetime(time))
+}
+
+get_coin <- function(.data, .coin, .coin_name, .days_back){
+  .data %>% 
+    filter(TICKER == .coin) %>% 
+    filter(date >= (max(date) - lubridate::days(.days_back))) %>% 
+    mutate(
+      Ticker = .coin,
+      Coin = .coin_name
+    )
+}
+
 ui <- material_page(
   title = "",
   nav_bar_fixed = TRUE,
@@ -111,13 +129,17 @@ ui <- material_page(
   )
 )
 
-pull_price <- function(ticker, days){
-  fromJSON(
-    paste0("https://min-api.cryptocompare.com/data/histoday?aggregate=1&e=CCCAGG&extraParams=CryptoCompare&fsym=", ticker, "&limit=", days, "&tryConversion=false&tsym=USD")
-  )$Data
-}
 
 server <- function(input, output, session) {
+  
+  yearData <- reactive({
+    
+    purrr::map_df(
+      c("BTC", "BCH", "ETH", "LTC"),
+      ~ pull_price(.x, 365)
+    )
+    
+  })
   
   rV <- reactiveValues()
   # observeEvent(input$day_back, priority = 1000, {
@@ -152,6 +174,8 @@ server <- function(input, output, session) {
     
     
     material_spinner_show(session, output_id = "wholeApp")
+    
+    
     ans <- data_frame()
     colors <- c()
     
@@ -160,11 +184,7 @@ server <- function(input, output, session) {
     if(input$BTC){
       ans <- bind_rows(
         ans,
-        pull_price("BTC", days_back) %>%
-          mutate(
-            Ticker = "BTC",
-            Coin = "Bitcoin"
-          )
+        yearData() %>% get_coin("BTC", "Bitcoin", days_back)
       )
       
       colors <- c(colors, my_col$BTC)
@@ -173,44 +193,34 @@ server <- function(input, output, session) {
     if(input$BCH){
       ans <- bind_rows(
         ans,
-        pull_price("BCH", days_back) %>% 
-          mutate(
-            Ticker = "BCH",
-            Coin = "Bitcoin Cash"
-          )
+        yearData() %>% get_coin("BCH", "Bitcoin Cash", days_back)
       )
       
       colors <- c(colors, my_col$BCH)
     }
     
     if(input$ETH){
+      
       ans <- bind_rows(
         ans,
-        pull_price("ETH", days_back) %>%
-          mutate(
-            Ticker = "ETH",
-            Coin = "Ethereum"
-          )
+        yearData() %>% get_coin("ETH", "Ethereum", days_back)
       )
       
       colors <- c(colors, my_col$ETH)
     }
     
     if(input$LTC){
+      
       ans <- bind_rows(
         ans,
-        pull_price("LTC", days_back) %>%
-          mutate(
-            Ticker = "LTC",
-            Coin = "Litecoin"
-          )
+        yearData() %>% get_coin("LTC", "Litecoin", days_back)
       )
       
       colors <- c(colors, my_col$LTC)
     }
     
     if(nrow(ans) > 0){
-      ans <- ans %>% mutate(date = as_datetime(time)) %>% 
+      ans <- ans %>%
         arrange(date) %>% 
         group_by(Coin) %>% 
         mutate(close_p = round(((close / close[1]) - 1) * 100, 0 ))
@@ -300,6 +310,7 @@ server <- function(input, output, session) {
     
     rV$plot_data$toPlot <- rV$plot_data[[input$adjType]]
     
+    
     rV$plot_data %>%
       ggvis(x = ~date, y = ~toPlot, stroke = ~Coin) %>%
       layer_lines(strokeWidth := 5, opacity := .7) %>%
@@ -327,6 +338,7 @@ server <- function(input, output, session) {
       HTML('<script>$(".plot-gear-icon").css("display", "none");</script>')
       
     })
+    
     
     material_spinner_hide(session, output_id = "wholeApp")
   })
