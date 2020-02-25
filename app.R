@@ -34,7 +34,8 @@ ui <- material_page(
         material_radio_button(
           "day_back",
           label = "",
-          choices = c("1 Week" = 7, "1 Month" = 30, "1 Year" = 365)
+          choices = c("1 Week" = 7, "1 Month" = 30, "1 Year" = 365),
+          selected = 30
         )
       )
     ),
@@ -120,13 +121,13 @@ pull_price <- function(ticker, days){
 server <- function(input, output, session) {
   
   rV <- reactiveValues()
-  observeEvent(input$day_back, priority = 1000, {
-    
-    if(input$day_back == "365"){
-      update_material_switch(session, input_id = "BCH", value = FALSE)
-    }
-    
-  })
+  # observeEvent(input$day_back, priority = 1000, {
+  #   
+  #   if(input$day_back == "365"){
+  #     update_material_switch(session, input_id = "BCH", value = FALSE)
+  #   }
+  #   
+  # })
   
   observe({
     
@@ -145,10 +146,10 @@ server <- function(input, output, session) {
       return(NULL)
     }
     
-    if(input$day_back == "365" & input$BCH) {
-      rV$plot_data <- data_frame()
-      return(NULL)
-    }
+    # if(input$day_back == "365" & input$BCH) {
+    #   rV$plot_data <- data_frame()
+    #   return(NULL)
+    # }
     
     
     material_spinner_show(session, output_id = "wholeApp")
